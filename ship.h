@@ -7,7 +7,7 @@ typedef struct
 {
 	Vector2 pos;
 	Vector2 vel;
-	Vector2 accel;
+	float accel_mag;
 	float theta;
 } Ship;
 

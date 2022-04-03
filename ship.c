@@ -3,6 +3,8 @@
 #include "de1_io.h"
 #include "game_math.h"
 
+#define MAX_VEL 5.0f
+
 static const Vector2 g_ship_model[] = { { 0.0f, -5.0f }, { -2.5f, 2.5f }, { 2.5f, 2.5f } };
 
 void ship_draw(const Ship *ship, uint16_t color)
@@ -28,11 +30,10 @@ void ship_draw(const Ship *ship, uint16_t color)
 
 void ship_update(Ship *ship)
 {
-	float accel_mag = vector2_magnitude(&ship->accel);
 
-	Vector2 thrust = { taylor_sin(ship->theta) * accel_mag, -taylor_cos(ship->theta) * accel_mag };
+	Vector2 thrust = { taylor_sin(ship->theta) * ship->accel_mag, -taylor_cos(ship->theta) * ship->accel_mag };
 	
-	if (vector2_magnitude(&ship->vel) <= 5.0f)
+	if (vector2_magnitude(&ship->vel) <= MAX_VEL)
 	{
 		vector2_add(&ship->vel, &ship->vel, &thrust);
 	}
