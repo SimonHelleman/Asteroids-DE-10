@@ -6,7 +6,7 @@ void set_led(uint8_t n, bool val)
 {
 	if (n > 9) return;
 	
-    volatile uint32_t *led_bp = (uint32_t *)LED_BASE;		
+	volatile uint32_t *led_bp = (uint32_t *)LED_BASE;		
 	*led_bp = val ? *led_bp | 1 << n : *led_bp & ~(1 << n);
 }
 

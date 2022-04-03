@@ -5,8 +5,8 @@
 
 typedef struct
 {
-    Vector2 pos;
-    Vector2 vel;
+	Vector2 pos;
+	Vector2 vel;
 } Bullet;
 
 void bullet_draw(const Bullet *bullet, uint16_t color);

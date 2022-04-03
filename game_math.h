@@ -1,7 +1,7 @@
 #ifndef GAME_MATH_H
 #define GAME_MATH_H
 #ifndef M_PI    
-    #define M_PI 3.141592653f
+	#define M_PI 3.141592653f
 #endif
 
 #define RADIANS(theta) ((theta) * M_PI / 180.0f)
