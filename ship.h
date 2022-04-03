@@ -13,4 +13,5 @@ typedef struct
 
 void ship_draw(const Ship *ship, uint16_t color);
 
+void ship_update(Ship *ship);
 #endif

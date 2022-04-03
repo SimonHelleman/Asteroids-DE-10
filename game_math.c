@@ -125,3 +125,15 @@ float bin_search_sqrt(float n)
 
     return mid;
 }
+
+void wrap_val(float *val, float lower_bound, float upper_bound)
+{
+    if (*val < lower_bound)
+    {
+        *val += upper_bound;
+    }
+    else if (*val >= upper_bound)
+    {
+        *val -= upper_bound;
+    }
+}

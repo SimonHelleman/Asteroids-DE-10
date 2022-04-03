@@ -13,4 +13,6 @@ float taylor_sin(float theta);
 float taylor_cos(float theta);
 int round_to_int(float val);
 float bin_search_sqrt(float val);
+
+void wrap_val(float *val, float lower_bound, float upper_bound);
 #endif
