@@ -33,15 +33,17 @@ int main(void)
 		
 	while (1)
 	{
+		// Clearing the screen is too costly atm
+		// double buffering could help but I am out of time
+		// to debug the memory corruption I seem to be having
+		// (due to the fact that the buffer can't go in standard RAM
+		// making managing the memory for this is 100% manual)
+		ship_draw(&ship, VGA_COLOR_BLACK);
 		ship_update(&ship);
+		ship_draw(&ship, VGA_COLOR_GREEN);
 
 		if (read_push_btn(0))
 		{
-			ship_draw(&ship, VGA_COLOR_BLACK);
-			//vga_swap_buffers();
-			//ship_draw(&ship, VGA_COLOR_BLACK);
-			//vga_swap_buffers();
-
 			ship.theta += RADIANS(0.1);
 		}
 
@@ -49,7 +51,7 @@ int main(void)
 		{
 			if (num_bullets_alive < MAX_BULLETS)
 			{
-				bullets[num_bullets_alive] = (Bullet *)malloc(sizeof(Bullet *));
+				bullets[num_bullets_alive] = (Bullet *)malloc(sizeof(Bullet));
 				Vector2 pos = { ship.pos.x, ship.pos.y };
 				Vector2 vel = { taylor_sin(ship.theta), -taylor_cos(ship.theta) };
 				bullets[num_bullets_alive]->pos = pos;
