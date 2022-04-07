@@ -55,6 +55,31 @@ bool read_push_btn(uint8_t n)
 	return *btn_bp & (1 << n);
 }
 
+bool read_push_btn_pressed(uint8_t n)
+{
+	if (n > 3) return LOW;
+
+	bool btn_state = read_push_btn(n);
+
+	static bool old_btn_state[4] = { LOW, LOW, LOW, LOW };
+
+	if (btn_state != old_btn_state[n])
+	{
+		old_btn_state[n] = btn_state;
+
+		if (btn_state == LOW)
+		{
+			return LOW;
+		}
+		else
+		{
+			return HIGH;
+		}
+	}
+
+	return LOW;
+}
+
 uint8_t read_push_btn_val_unsigned()
 {
 	volatile uint32_t *pb_bp = (uint32_t *)KEY_BASE;

@@ -62,6 +62,7 @@ bool read_switch(uint8_t n);
 uint16_t read_switch_val_unsigned();
 int16_t read_switch_val_signed();
 bool read_push_btn(uint8_t n);
+bool read_push_btn_pressed(uint8_t n); // Only high on transition
 uint8_t read_push_btn_val_unsigned();
 void set_segment(uint8_t n, bool val);
 void display_hex_digit(uint8_t display, int8_t digit);

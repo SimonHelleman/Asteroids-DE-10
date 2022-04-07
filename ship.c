@@ -3,7 +3,7 @@
 #include "de1_io.h"
 #include "game_math.h"
 
-#define MAX_VEL 5.0f
+#define MAX_VEL 0.5f
 
 static const Vector2 g_ship_model[] = { { 0.0f, -5.0f }, { -2.5f, 2.5f }, { 2.5f, 2.5f } };
 

@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "ship.h": "c"
+        "ship.h": "c",
+        "vga_graphics.h": "c"
     }
 }
