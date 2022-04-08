@@ -28,17 +28,17 @@ OCFLAGS		:= -O srec
 
 # Files
 HDRS		:=
-SRCS		:= bullet.c de1_io.c game.c game_math.c ship.c vector.c vga_graphics.c asteroid.c
+SRCS		:= asteroid.c bullet.c de1_io.c game.c game_math.c ship.c vector.c vga_graphics.c
 OBJS		:= $(patsubst %, %.o, $(SRCS))
 
 # Targets
-compile: bullet.srec
+compile: asteroid.srec
 
-bullet.srec: bullet.axf
+asteroid.srec: asteroid.axf
 	$(RM) $@
 	$(OC) $(OCFLAGS) $< $@
 
-bullet.axf: $(OBJS)
+asteroid.axf: $(OBJS)
 	$(RM) $@
 	$(CC) $(LDFLAGS) $(OBJS) -o $@
 
@@ -51,5 +51,5 @@ bullet.axf: $(OBJS)
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	$(RM) bullet.srec bullet.axf $(OBJS)
+	$(RM) asteroid.srec asteroid.axf $(OBJS)
 

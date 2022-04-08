@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include "vector.h"
 
+#define BULLET_WIDTH 5
+#define BULLET_HEIGHT 5
+
 typedef struct
 {
 	Vector2 pos;

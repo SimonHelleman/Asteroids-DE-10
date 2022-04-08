@@ -23,41 +23,27 @@ bool is_off_screen(const Vector2 *pos)
 	return pos->x > VGA_PIXEL_WIDTH || pos->y > VGA_PIXEL_HEIGHT || pos->x < 0 || pos->y < 0;
 }
 
-bool rectangle_overlap_test(const Vector2 *a, uint32_t width_a, uint32_t height_a, const Vector2 *b, const uint32_t width_b, const uint32_t height_b)
+bool rectangle_overlap_test(const Vector2 *a, uint32_t width_a, uint32_t height_a, const Vector2 *b, uint32_t width_b, uint32_t height_b)
 {
-	return a->x < b->x + width_b && 
-	a->x + width_a > b->x &&
-	a->y < b->y + height_b &&
-	height_a + a->y > b->y;
+	float rect_a_left = a->x;
+	float rect_a_right = a->x + width_a;
+	float rect_a_top = a->y;
+	float rect_a_bottom = a->y + height_a;
+
+	float rect_b_left = b->x;
+	float rect_b_right = b->x + width_b;
+	float rect_b_top = b->y;
+	float rect_b_bottom = b->y + height_b;
+
+	return (rect_b_left < rect_a_right && rect_b_top < rect_a_bottom && rect_a_left < rect_b_right && rect_a_top < rect_b_bottom);
 }
 
-void test_clear()
+void spaw_asteroids(Asteroid *asteroids, uint32_t n)
 {
-	memset((void *)FPGA_PIXEL_BUF_BASE, 0, 320 * 240 * 2);
-}
-
-int main(void)
-{
-	Vector2 ship_init_pos = { 30.0f, 30.0f };
-	Vector2 ship_init_vel = { 0.0f, 0.0f };
-
-	Ship ship = {ship_init_pos, ship_init_vel, 0.0f, 0.0f};
-
-	
-	Vector2 o = {0.0f, 0.0f};
-	
-	int num_bullets_alive = 0;
-	Bullet *bullets[MAX_BULLETS];
-
-
-	int num_asteroids_alive = 5;
-	Asteroid asteroids[MAX_ASTEROIDS];
-
-
 	Vector2 asteroid_pos_upper_limit = { VGA_PIXEL_WIDTH - ASTEROID_WIDTH, VGA_PIXEL_HEIGHT - ASTEROID_HEIGHT };
 	Vector2 asteroid_pos_lower_limit = { 30.0f, 30.0f };
-	
-	for (int i = 0; i < num_asteroids_alive; ++i)
+
+	for (int i = 0; i < n; ++i)
 	{
 		asteroids[i].pos.x = (float)rand() / (RAND_MAX / (asteroid_pos_upper_limit.x - asteroid_pos_lower_limit.x));
 		asteroids[i].pos.y = (float)rand() / (RAND_MAX / (asteroid_pos_upper_limit.y - asteroid_pos_lower_limit.y));
@@ -65,6 +51,27 @@ int main(void)
 		asteroids[i].vel.x = (float)rand() / (RAND_MAX / 0.1f);
 		asteroids[i].vel.y = (float)rand() / (RAND_MAX / 0.1f);
 	}
+
+}
+
+int main(void)
+{
+	Vector2 ship_init_pos = { 30.0f, 30.0f };
+	Vector2 ship_init_vel = { 0.0f, 0.0f };
+
+	Ship ship = { ship_init_pos, ship_init_vel, 0.0f, 0.0f };
+
+	
+	Vector2 o = { 0.0f, 0.0f };
+	
+	int num_bullets_alive = 0;
+	Bullet bullets[MAX_BULLETS];
+
+
+	int start_asteroids = 5;
+	int num_asteroids_alive = start_asteroids;
+	Asteroid asteroids[MAX_ASTEROIDS];
+	spaw_asteroids(asteroids, start_asteroids);
 
 	vga_clear(0x0000);
 	
@@ -112,11 +119,11 @@ int main(void)
 		{
 			if (num_bullets_alive < MAX_BULLETS)
 			{
-				bullets[num_bullets_alive] = (Bullet *)malloc(sizeof(Bullet));
+				//bullets[num_bullets_alive] = (Bullet *)malloc(sizeof(Bullet));
 				Vector2 pos = { ship.pos.x, ship.pos.y };
 				Vector2 vel = { taylor_sin(ship.theta), -taylor_cos(ship.theta) };
-				bullets[num_bullets_alive]->pos = pos;
-				bullets[num_bullets_alive]->vel = vel;
+				bullets[num_bullets_alive].pos = pos;
+				bullets[num_bullets_alive].vel = vel;
 				++num_bullets_alive;
 			}
 
@@ -124,15 +131,20 @@ int main(void)
 
 		for (int i = 0; i < num_bullets_alive; ++i)
 		{
-			bullet_draw(bullets[i], VGA_COLOR_BLACK);
-			bullet_update(bullets[i]);
-			bullet_draw(bullets[i], VGA_COLOR_WHITE);
+			bullet_draw(&bullets[i], VGA_COLOR_BLACK);
+			bullet_update(&bullets[i]);
+			bullet_draw(&bullets[i], VGA_COLOR_WHITE);
 
-			if (is_off_screen(&bullets[i]->pos))
+			if (is_off_screen(&bullets[i].pos))
 			{
+				bullet_draw(&bullets[i], VGA_COLOR_BLACK);
+				
+				for (int j = i; j < num_bullets_alive - 1; ++j)
+				{
+					bullets[j] = bullets[j + 1];
+				}	
 				--num_bullets_alive;
-				bullet_draw(bullets[i], VGA_COLOR_BLACK);
-				free(bullets[num_bullets_alive]);
+				//free(&bullets[num_bullets_alive]);
 				
 			}
 		}
@@ -145,16 +157,60 @@ int main(void)
 			asteroid_draw(&asteroids[i], VGA_COLOR_BLACK);
 			asteroid_update(&asteroids[i]);
 
-			for (int j = 0; j < num_asteroids_alive; ++j)  
+			/*
+			for (int j = 0; j < num_asteroids_alive; ++j)
 			{
-				if (rectangle_overlap_test(&asteroids[i].pos, ASTEROID_WIDTH, ASTEROID_HEIGHT, &asteroids[j].pos, ASTEROID_HEIGHT, ASTEROID_HEIGHT))
+				if (rectangle_overlap_test(&asteroids[i].pos, ASTEROID_WIDTH, ASTEROID_HEIGHT, &asteroids[j].pos, ASTEROID_WIDTH, ASTEROID_HEIGHT) && (i != j))
 				{
+					Vector2 vel_a = asteroids[i].vel;
+					Vector2 vel_b = asteroids[j].vel;
+					// same sign
+					if ((vel_a.x > 0 && vel_b.x > 0) || (vel_a.x < 0 && vel_b.x < 0))
+					{
+						asteroids[i].vel.x *= -1.0f;	
+					}
 					vector2_scale(&asteroids[i].vel, &asteroids[i].vel, -1.0f);
 					vector2_scale(&asteroids[j].vel, &asteroids[j].vel, -1.0f);
 				}
+				
 			}
+			*/
 
 			asteroid_draw(&asteroids[i], VGA_COLOR_RED);
+		}
+
+
+		for (int i = 0; i < num_bullets_alive; ++i)
+		{
+			for (int j = 0; j < num_asteroids_alive; ++j)
+			{
+				if (rectangle_overlap_test(&bullets[i].pos, BULLET_WIDTH, BULLET_HEIGHT, &asteroids[j].pos, ASTEROID_WIDTH, ASTEROID_HEIGHT))
+				{
+					bullet_draw(&bullets[i], VGA_COLOR_BLACK);
+
+					for (int k = i; k < num_bullets_alive - 1; ++k)
+					{
+						bullets[k] = bullets[k + 1];
+					}	
+					--num_bullets_alive;
+
+					asteroid_draw(&asteroids[j], VGA_COLOR_BLACK);
+
+					for (int k = j; k < num_asteroids_alive - 1; ++k)
+					{
+						asteroids[k] = asteroids[k + 1];
+					}	
+					--num_asteroids_alive;
+
+				}
+			}
+		}
+
+		if (num_asteroids_alive <= 0)
+		{
+			start_asteroids += 5;
+			num_asteroids_alive = start_asteroids;
+			spaw_asteroids(asteroids, start_asteroids);
 		}
 
 		vga_draw_rect(&o, 319, 239, 0xffff);        

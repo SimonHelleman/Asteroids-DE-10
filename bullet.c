@@ -3,7 +3,7 @@
 
 void bullet_draw(const Bullet *bullet, uint16_t color)
 {
-	vga_fill_rect(&bullet->pos, 5, 5, color);
+	vga_fill_rect(&bullet->pos, BULLET_WIDTH, BULLET_HEIGHT, color);
 }
 
 void bullet_update(Bullet *bullet)
